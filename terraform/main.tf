@@ -14,22 +14,22 @@ module "cloudfront" {
   bucket_regional_domain_name = module.s3.bucket_regional_domain_name
 }
 
-resource "aws_s3_bucket" "terraform_state" {
-  bucket = var.state_bucket_name
+# resource "aws_s3_bucket" "terraform_state" {
+#   bucket = var.state_bucket_name
 
-  tags = {
-    Name        = var.state_bucket_name
-    Environment = "shared"
-  }
-}
+#   tags = {
+#     Name        = var.state_bucket_name
+#     Environment = "shared"
+#   }
+# }
 
-resource "aws_s3_bucket_versioning" "terraform_state" {
-  bucket = aws_s3_bucket.terraform_state.id
+# resource "aws_s3_bucket_versioning" "terraform_state" {
+#   bucket = aws_s3_bucket.terraform_state.id
 
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }
 
 resource "aws_dynamodb_table" "terraform_locks" {
   name         = var.lock_table_name
