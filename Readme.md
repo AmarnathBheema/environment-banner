@@ -100,7 +100,6 @@ The application uses nginx and accepts the environment at runtime through the `E
 Build:
 
 ```bash
-cd part2
 docker build -t environment-banner:1.0 .
 ```
 
@@ -254,8 +253,8 @@ terraform plan
 ### Helm
 
 ```bash
-helm lint ./part2/helm/environment-banner
-helm template environment-banner ./part2/helm/environment-banner
+helm lint ./helm/environment-banner
+helm template environment-banner ./helm/environment-banner
 ```
 
 ## Cleanup
