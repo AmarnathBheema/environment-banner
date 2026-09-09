@@ -20,3 +20,13 @@ output "state_bucket_name" {
 output "lock_table_name" {
   value = aws_dynamodb_table.terraform_locks.name
 }
+
+output "github_actions_role_arn" {
+  description = "IAM role ARN for GitHub Actions OIDC"
+  value       = aws_iam_role.github_actions.arn
+}
+
+output "github_oidc_provider_arn" {
+  description = "GitHub OIDC provider ARN"
+  value       = aws_iam_openid_connect_provider.github.arn
+}

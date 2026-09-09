@@ -21,6 +21,7 @@ spec:
 
       annotations:
         configmap-revision: {{ .Values.env | quote }}
+        build-sha: {{ .Values.buildSha | quote }}
 
     spec:
       containers:
@@ -40,6 +41,8 @@ spec:
                 configMapKeyRef:
                   name: environment-banner-config
                   key: environment
+            - name: BUILD_SHA
+              value: {{ .Values.buildSha | quote }}
 
           readinessProbe:
             httpGet:

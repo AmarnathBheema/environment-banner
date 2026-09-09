@@ -27,3 +27,14 @@ variable "lock_table_name" {
   description = "DynamoDB table used for Terraform state locking"
   type        = string
 }
+
+variable "github_repository" {
+  description = "GitHub repository in owner/repository format"
+  type        = string
+}
+
+variable "github_branch" {
+  description = "GitHub branch allowed to assume the role"
+  type        = string
+  default     = "bonus"
+}

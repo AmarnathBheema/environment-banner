@@ -6,9 +6,11 @@ on:
     branches:
       - main
       - dev
+      - bonus
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   terraform:
@@ -29,11 +31,13 @@ jobs:
           terraform_version: 1.16.1
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
 
       - name: Terraform Init
         run: terraform init
@@ -50,6 +54,8 @@ jobs:
             echo "TFVARS_FILE=environments/prod.tfvars" >> "$GITHUB_ENV"
           elif [ "${GITHUB_REF_NAME}" = "dev" ]; then
             echo "TFVARS_FILE=environments/dev.tfvars" >> "$GITHUB_ENV"
+          elif [ "${GITHUB_REF_NAME}" = "bonus" ]; then
+            echo "TFVARS_FILE=environments/dev.tfvars" >> "$GITHUB_ENV"
           else
             echo "Unsupported branch: ${GITHUB_REF_NAME}"
             exit 1
@@ -57,3 +63,36 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -var-file="$TFVARS_FILE"
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        run: terraform apply -auto-approve -var-file="$TFVARS_FILE"
+
+      - name: Invalidate CloudFront cache
+        if: github.event_name == 'push'
+        run: |
+          DISTRIBUTION_ID=$(terraform output -raw cloudfront_distribution_id)
+
+          aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/*"
+
+      - name: Helm Lint
+        working-directory: helm
+        run: helm lint ./environment-banner
+
+      - name: Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform
+          framework: terraform
+
+      - name: Set build SHA
+        run: echo "BUILD_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Helm Template
+        working-directory: helm
+        run: |
+          helm template environment-banner ./environment-banner \
+            --set env=Dev \
+            --set buildSha="$BUILD_SHA"
