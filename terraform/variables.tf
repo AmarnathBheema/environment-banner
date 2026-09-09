@@ -38,3 +38,13 @@ variable "github_branch" {
   type        = string
   default     = "bonus"
 }
+
+variable "github_owner_id" {
+  description = "GitHub owner ID"
+  type        = string
+}
+
+variable "github_repository_id" {
+  description = "GitHub repository ID"
+  type        = string
+}
