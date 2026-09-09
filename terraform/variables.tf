@@ -28,23 +28,23 @@ variable "lock_table_name" {
   type        = string
 }
 
-variable "github_repository" {
-  description = "GitHub repository in owner/repository format"
-  type        = string
-}
+# variable "github_repository" {
+#   description = "GitHub repository in owner/repository format"
+#   type        = string
+# }
 
-variable "github_branch" {
-  description = "GitHub branch allowed to assume the role"
-  type        = string
-  default     = "bonus"
-}
+# variable "github_branch" {
+#   description = "GitHub branch allowed to assume the role"
+#   type        = string
+#   default     = "bonus"
+# }
 
-variable "github_owner_id" {
-  description = "GitHub owner ID"
-  type        = string
-}
+# variable "github_owner_id" {
+#   description = "GitHub owner ID"
+#   type        = string
+# }
 
-variable "github_repository_id" {
-  description = "GitHub repository ID"
-  type        = string
-}
+# variable "github_repository_id" {
+#   description = "GitHub repository ID"
+#   type        = string
+# }

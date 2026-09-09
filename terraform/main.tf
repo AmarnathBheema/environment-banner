@@ -47,105 +47,105 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 
-resource "aws_iam_openid_connect_provider" "github" {
-  url = "https://token.actions.githubusercontent.com"
+# resource "aws_iam_openid_connect_provider" "github" {
+#   url = "https://token.actions.githubusercontent.com"
 
-  client_id_list = [
-    "sts.amazonaws.com"
-  ]
-}
+#   client_id_list = [
+#     "sts.amazonaws.com"
+#   ]
+# }
 
-resource "aws_iam_role" "github_actions" {
-  name = "github-actions-environment-banner"
+# resource "aws_iam_role" "github_actions" {
+#   name = "github-actions-environment-banner"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
 
-    Statement = [
-      {
-        Effect = "Allow"
+#     Statement = [
+#       {
+#         Effect = "Allow"
 
-        Principal = {
-          Federated = aws_iam_openid_connect_provider.github.arn
-        }
+#         Principal = {
+#           Federated = aws_iam_openid_connect_provider.github.arn
+#         }
 
-        Action = "sts:AssumeRoleWithWebIdentity"
+#         Action = "sts:AssumeRoleWithWebIdentity"
 
-        Condition = {
-          StringEquals = {
-            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-          }
+#         Condition = {
+#           StringEquals = {
+#             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+#           }
 
-          StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}@${var.github_owner_id}/environment-banner@${var.github_repository_id}:ref:refs/heads/bonus"
-          }
-        }
-      }
-    ]
-  })
-}
+#           StringLike = {
+#             "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}@${var.github_owner_id}/environment-banner@${var.github_repository_id}:ref:refs/heads/bonus"
+#           }
+#         }
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_policy" "github_actions_terraform" {
-  name        = "github-actions-environment-banner-terraform"
-  description = "Permissions for GitHub Actions to manage the environment banner infrastructure"
+# resource "aws_iam_policy" "github_actions_terraform" {
+#   name        = "github-actions-environment-banner-terraform"
+#   description = "Permissions for GitHub Actions to manage the environment banner infrastructure"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
+#   policy = jsonencode({
+#     Version = "2012-10-17"
 
-    Statement = [
-      # S3 state permissions
-      {
-        Effect = "Allow"
+#     Statement = [
+#       # S3 state permissions
+#       {
+#         Effect = "Allow"
 
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
+#         Action = [
+#           "s3:GetObject",
+#           "s3:PutObject",
+#           "s3:DeleteObject",
+#           "s3:ListBucket"
+#         ]
 
-        Resource = [
-          "arn:aws:s3:::environment-banner-terraform-state",
-          "arn:aws:s3:::environment-banner-terraform-state/*"
-        ]
-      },
+#         Resource = [
+#           "arn:aws:s3:::environment-banner-terraform-state",
+#           "arn:aws:s3:::environment-banner-terraform-state/*"
+#         ]
+#       },
 
-      # DynamoDB state locking permissions
-      {
-        Effect = "Allow"
+#       # DynamoDB state locking permissions
+#       {
+#         Effect = "Allow"
 
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem"
-        ]
+#         Action = [
+#           "dynamodb:GetItem",
+#           "dynamodb:PutItem",
+#           "dynamodb:DeleteItem"
+#         ]
 
-        Resource = "arn:aws:dynamodb:${var.aws_region}:*:table/environment-banner-terraform-locks"
-      },
+#         Resource = "arn:aws:dynamodb:${var.aws_region}:*:table/environment-banner-terraform-locks"
+#       },
 
-      # CloudFront permissions
-      {
-        Effect = "Allow"
+#       # CloudFront permissions
+#       {
+#         Effect = "Allow"
 
-        Action = [
-          "cloudfront:GetDistribution",
-          "cloudfront:GetDistributionConfig",
-          "cloudfront:ListDistributions",
-          "cloudfront:CreateDistribution",
-          "cloudfront:UpdateDistribution",
-          "cloudfront:DeleteDistribution",
-          "cloudfront:TagResource",
-          "cloudfront:UntagResource",
-          "cloudfront:CreateInvalidation"
-        ]
+#         Action = [
+#           "cloudfront:GetDistribution",
+#           "cloudfront:GetDistributionConfig",
+#           "cloudfront:ListDistributions",
+#           "cloudfront:CreateDistribution",
+#           "cloudfront:UpdateDistribution",
+#           "cloudfront:DeleteDistribution",
+#           "cloudfront:TagResource",
+#           "cloudfront:UntagResource",
+#           "cloudfront:CreateInvalidation"
+#         ]
 
-        Resource = "*"
-      }
-    ]
-  })
-}
+#         Resource = "*"
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_role_policy_attachment" "github_actions_terraform" {
-  role       = aws_iam_role.github_actions.name
-  policy_arn = aws_iam_policy.github_actions_terraform.arn
-}
+# resource "aws_iam_role_policy_attachment" "github_actions_terraform" {
+#   role       = aws_iam_role.github_actions.name
+#   policy_arn = aws_iam_policy.github_actions_terraform.arn
+# }
