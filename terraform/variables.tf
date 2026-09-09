@@ -18,10 +18,10 @@ variable "bucket_name" {
   type        = string
 }
 
-variable "state_bucket_name" {
-  description = "S3 bucket used for Terraform remote state"
-  type        = string
-}
+# variable "state_bucket_name" {
+#   description = "S3 bucket used for Terraform remote state"
+#   type        = string
+# }
 
 variable "lock_table_name" {
   description = "DynamoDB table used for Terraform state locking"
