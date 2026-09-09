@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 permissions:
   contents: read
@@ -43,5 +44,16 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Select Terraform environment
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "TFVARS_FILE=environments/prod.tfvars" >> "$GITHUB_ENV"
+          elif [ "${GITHUB_REF_NAME}" = "dev" ]; then
+            echo "TFVARS_FILE=environments/dev.tfvars" >> "$GITHUB_ENV"
+          else
+            echo "Unsupported branch: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -var-file="$TFVARS_FILE"
